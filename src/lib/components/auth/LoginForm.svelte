@@ -35,18 +35,22 @@
 			} else {
 				message = 'Check your email for the confirmation link!';
 			}
+			loading = false;
 		} else {
-			const { error: signInError } = await supabase.auth.signInWithPassword({
+			const { error: signInError, data } = await supabase.auth.signInWithPassword({
 				email,
 				password
 			});
 
 			if (signInError) {
 				error = signInError.message;
+				loading = false;
+			} else if (data.session) {
+				// Redirect immediately after successful login
+				window.location.href = '/';
+				return;
 			}
 		}
-
-		loading = false;
 	}
 
 	async function handleOAuthLogin(provider: 'google' | 'github') {
