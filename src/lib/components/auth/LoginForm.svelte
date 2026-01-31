@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { TypedSupabaseClient } from '$lib/supabase';
-	import Button from '$lib/components/ui/Button.svelte';
 	import Spinner from '$lib/components/ui/Spinner.svelte';
 
 	interface Props {
@@ -68,102 +67,93 @@
 	}
 </script>
 
-<div class="w-full max-w-md mx-auto">
-	<div class="bg-white rounded-lg shadow-md p-8">
-		<h2 class="text-2xl font-bold text-center mb-6">
-			{isSignUp ? 'Create Account' : 'Welcome Back'}
-		</h2>
+<div class="w-full max-w-sm">
+	<div class="text-center mb-8">
+		<h1 class="text-2xl font-semibold text-[#1d1d1f] tracking-tight">
+			{isSignUp ? 'Create your account' : 'Sign in'}
+		</h1>
+	</div>
 
-		<form onsubmit={handleSubmit} class="space-y-4">
-			<div>
-				<label for="email" class="block text-sm font-medium text-gray-700 mb-1">
-					Email
-				</label>
-				<input
-					id="email"
-					type="email"
-					bind:value={email}
-					required
-					class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-					placeholder="you@example.com"
-				/>
-			</div>
-
-			<div>
-				<label for="password" class="block text-sm font-medium text-gray-700 mb-1">
-					Password
-				</label>
-				<input
-					id="password"
-					type="password"
-					bind:value={password}
-					required
-					minlength="6"
-					class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-					placeholder="••••••••"
-				/>
-			</div>
-
-			{#if error}
-				<div class="p-3 bg-red-50 border border-red-200 rounded-md">
-					<p class="text-sm text-red-600">{error}</p>
-				</div>
-			{/if}
-
-			{#if message}
-				<div class="p-3 bg-green-50 border border-green-200 rounded-md">
-					<p class="text-sm text-green-600">{message}</p>
-				</div>
-			{/if}
-
-			<Button type="submit" disabled={loading} fullWidth>
-				{#if loading}
-					<Spinner size="sm" />
-				{:else}
-					{isSignUp ? 'Sign Up' : 'Sign In'}
-				{/if}
-			</Button>
-		</form>
-
-		<div class="mt-6">
-			<div class="relative">
-				<div class="absolute inset-0 flex items-center">
-					<div class="w-full border-t border-gray-300"></div>
-				</div>
-				<div class="relative flex justify-center text-sm">
-					<span class="px-2 bg-white text-gray-500">Or continue with</span>
-				</div>
-			</div>
-
-			<div class="mt-4 grid grid-cols-2 gap-3">
-				<button
-					type="button"
-					onclick={() => handleOAuthLogin('google')}
-					disabled={loading}
-					class="flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
-				>
-					Google
-				</button>
-				<button
-					type="button"
-					onclick={() => handleOAuthLogin('github')}
-					disabled={loading}
-					class="flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
-				>
-					GitHub
-				</button>
-			</div>
+	<form onsubmit={handleSubmit} class="space-y-4">
+		<div>
+			<input
+				id="email"
+				type="email"
+				bind:value={email}
+				required
+				class="w-full h-12 px-4 bg-white border border-[#d2d2d7] rounded-xl text-[#1d1d1f] placeholder-[#86868b] focus:outline-none focus:border-[#0071e3] focus:ring-1 focus:ring-[#0071e3] transition-colors"
+				placeholder="Email"
+			/>
 		</div>
 
-		<p class="mt-6 text-center text-sm text-gray-600">
-			{isSignUp ? 'Already have an account?' : "Don't have an account?"}
+		<div>
+			<input
+				id="password"
+				type="password"
+				bind:value={password}
+				required
+				minlength="6"
+				class="w-full h-12 px-4 bg-white border border-[#d2d2d7] rounded-xl text-[#1d1d1f] placeholder-[#86868b] focus:outline-none focus:border-[#0071e3] focus:ring-1 focus:ring-[#0071e3] transition-colors"
+				placeholder="Password"
+			/>
+		</div>
+
+		{#if error}
+			<p class="text-sm text-[#ff3b30]">{error}</p>
+		{/if}
+
+		{#if message}
+			<p class="text-sm text-[#34c759]">{message}</p>
+		{/if}
+
+		<button
+			type="submit"
+			disabled={loading}
+			class="w-full h-12 bg-[#0071e3] text-white font-medium rounded-xl hover:bg-[#0077ed] disabled:opacity-50 transition-colors"
+		>
+			{#if loading}
+				<Spinner size="sm" />
+			{:else}
+				{isSignUp ? 'Create Account' : 'Sign In'}
+			{/if}
+		</button>
+	</form>
+
+	<div class="mt-8">
+		<div class="flex items-center gap-4 mb-6">
+			<div class="flex-1 h-px bg-[#d2d2d7]"></div>
+			<span class="text-xs text-[#86868b]">or</span>
+			<div class="flex-1 h-px bg-[#d2d2d7]"></div>
+		</div>
+
+		<div class="space-y-3">
 			<button
 				type="button"
-				onclick={() => (isSignUp = !isSignUp)}
-				class="ml-1 font-medium text-blue-600 hover:text-blue-500"
+				onclick={() => handleOAuthLogin('google')}
+				disabled={loading}
+				class="w-full h-12 bg-white border border-[#d2d2d7] rounded-xl text-[#1d1d1f] font-medium hover:bg-[#f5f5f7] disabled:opacity-50 transition-colors"
 			>
-				{isSignUp ? 'Sign In' : 'Sign Up'}
+				Continue with Google
 			</button>
-		</p>
+			<button
+				type="button"
+				onclick={() => handleOAuthLogin('github')}
+				disabled={loading}
+				class="w-full h-12 bg-white border border-[#d2d2d7] rounded-xl text-[#1d1d1f] font-medium hover:bg-[#f5f5f7] disabled:opacity-50 transition-colors"
+			>
+				Continue with GitHub
+			</button>
+		</div>
 	</div>
+
+	<p class="mt-8 text-center text-sm text-[#86868b]">
+		{isSignUp ? 'Already have an account?' : "Don't have an account?"}
+		<button
+			type="button"
+			onclick={() => (isSignUp = !isSignUp)}
+			class="text-[#0071e3] hover:underline"
+		>
+			{isSignUp ? 'Sign in' : 'Create one'}
+		</button>
+	</p>
 </div>

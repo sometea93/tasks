@@ -10,7 +10,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	}
 
 	try {
-		const { input } = await request.json();
+		const { input, timezone } = await request.json();
 
 		if (!input || typeof input !== 'string' || input.trim().length === 0) {
 			return json(
@@ -19,7 +19,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			);
 		}
 
-		const parsedTask = await parseTaskWithAI(input.trim());
+		const parsedTask = await parseTaskWithAI(input.trim(), timezone || 'UTC');
 
 		return json({ success: true, data: parsedTask } satisfies NLPResponse);
 	} catch (error) {

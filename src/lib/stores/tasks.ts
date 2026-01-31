@@ -22,7 +22,10 @@ function createTasksStore() {
 		addTask: (task: Task) => {
 			update((state) => ({
 				...state,
-				tasks: [task, ...state.tasks]
+				// Prevent duplicates if task already exists (e.g., from optimistic update + realtime)
+				tasks: state.tasks.some((t) => t.id === task.id)
+					? state.tasks
+					: [task, ...state.tasks]
 			}));
 		},
 		updateTask: (id: string, updates: Partial<Task>) => {
@@ -56,9 +59,11 @@ export const activeTasks = derived(tasksStore, ($store) =>
 	$store.tasks
 		.filter((t) => t.status === 'active')
 		.sort((a, b) => {
-			// Sort by priority first (1 = high priority comes first)
-			if (a.priority !== b.priority) {
-				return a.priority - b.priority;
+			// Sort by priority first (1 = high priority comes first, null = no priority goes last)
+			const aPrio = a.priority ?? 999;
+			const bPrio = b.priority ?? 999;
+			if (aPrio !== bPrio) {
+				return aPrio - bPrio;
 			}
 			// Then by due date (earlier dates first, null dates last)
 			if (a.due_date && b.due_date) {

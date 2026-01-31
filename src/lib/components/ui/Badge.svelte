@@ -9,15 +9,13 @@
 	let { variant = 'default', children }: Props = $props();
 
 	const variants = {
-		high: 'bg-red-100 text-red-800',
-		normal: 'bg-blue-100 text-blue-800',
-		low: 'bg-gray-100 text-gray-800',
-		default: 'bg-gray-100 text-gray-600'
+		high: 'text-[#ff3b30]',
+		normal: 'text-[#007aff]',
+		low: 'text-[#8e8e93]',
+		default: 'text-[#8e8e93]'
 	};
 </script>
 
-<span
-	class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {variants[variant]}"
->
+<span class="text-[13px] font-medium {variants[variant]}">
 	{@render children()}
 </span>

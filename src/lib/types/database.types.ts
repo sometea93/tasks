@@ -9,12 +9,51 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      task_completions: {
+        Row: {
+          id: string;
+          task_id: string;
+          user_id: string;
+          completed_date: string;
+          completed_at: string;
+        };
+        Insert: {
+          id?: string;
+          task_id: string;
+          user_id: string;
+          completed_date: string;
+          completed_at?: string;
+        };
+        Update: {
+          id?: string;
+          task_id?: string;
+          user_id?: string;
+          completed_date?: string;
+          completed_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'task_completions_task_id_fkey';
+            columns: ['task_id'];
+            isOneToOne: false;
+            referencedRelation: 'tasks';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'task_completions_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'users';
+            referencedColumns: ['id'];
+          }
+        ];
+      };
       tasks: {
         Row: {
           id: string;
           user_id: string;
           title: string;
-          priority: number;
+          priority: number | null;
           due_date: string | null;
           recurrence_rule: string | null;
           status: 'active' | 'completed';
@@ -26,7 +65,7 @@ export type Database = {
           id?: string;
           user_id: string;
           title: string;
-          priority?: number;
+          priority?: number | null;
           due_date?: string | null;
           recurrence_rule?: string | null;
           status?: 'active' | 'completed';
@@ -38,7 +77,7 @@ export type Database = {
           id?: string;
           user_id?: string;
           title?: string;
-          priority?: number;
+          priority?: number | null;
           due_date?: string | null;
           recurrence_rule?: string | null;
           status?: 'active' | 'completed';

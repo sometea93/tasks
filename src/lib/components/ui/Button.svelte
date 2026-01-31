@@ -18,19 +18,19 @@
 		...rest
 	}: Props = $props();
 
-	const baseStyles = 'inline-flex items-center justify-center font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
+	const baseStyles = 'inline-flex items-center justify-center font-medium rounded-xl transition-colors disabled:opacity-50';
 
 	const variants = {
-		primary: 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500',
-		secondary: 'bg-gray-200 text-gray-900 hover:bg-gray-300 focus:ring-gray-500',
-		danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500',
-		ghost: 'text-gray-700 hover:bg-gray-100 focus:ring-gray-500'
+		primary: 'bg-[#007aff] text-white hover:bg-[#0056b3]',
+		secondary: 'bg-[#f5f5f7] text-[#1d1d1f] hover:bg-[#e8e8ed]',
+		danger: 'bg-[#ff3b30] text-white hover:bg-[#d63029]',
+		ghost: 'text-[#007aff] hover:text-[#0056b3]'
 	};
 
 	const sizes = {
-		sm: 'px-3 py-1.5 text-sm',
-		md: 'px-4 py-2 text-sm',
-		lg: 'px-6 py-3 text-base'
+		sm: 'px-3 py-1.5 text-[13px]',
+		md: 'px-4 py-2 text-[15px]',
+		lg: 'px-6 py-3 text-[17px]'
 	};
 </script>
 

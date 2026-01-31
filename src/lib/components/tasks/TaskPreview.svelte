@@ -1,8 +1,8 @@
 <script lang="ts">
 	import type { ParsedTask } from '$lib/types/nlp-response';
-	import Badge from '$lib/components/ui/Badge.svelte';
 	import Spinner from '$lib/components/ui/Spinner.svelte';
-	import { PRIORITY_LABELS } from '$lib/types/task';
+	import { PRIORITY_LABELS, PRIORITY_COLORS } from '$lib/types/task';
+	import { recurrenceService } from '$lib/services/recurrence-service';
 
 	interface Props {
 		parsedTask: ParsedTask | null;
@@ -24,70 +24,49 @@
 		});
 	}
 
-	function formatRecurrence(rule: string | null): string {
-		if (!rule) return '';
-		// Simple RRULE parsing for display
-		if (rule.includes('FREQ=DAILY')) return 'Daily';
-		if (rule.includes('FREQ=WEEKLY')) {
-			const match = rule.match(/BYDAY=([A-Z,]+)/);
-			if (match) {
-				const days = match[1].split(',').map((d) => {
-					const dayMap: Record<string, string> = {
-						MO: 'Mon',
-						TU: 'Tue',
-						WE: 'Wed',
-						TH: 'Thu',
-						FR: 'Fri',
-						SA: 'Sat',
-						SU: 'Sun'
-					};
-					return dayMap[d] || d;
-				});
-				return `Weekly on ${days.join(', ')}`;
-			}
-			return 'Weekly';
-		}
-		if (rule.includes('FREQ=MONTHLY')) return 'Monthly';
-		return rule;
-	}
+	let priorityColor = $derived(
+		parsedTask ? PRIORITY_COLORS[parsedTask.priority as 1 | 2 | 3] || '#8e8e93' : '#8e8e93'
+	);
 
-	const priorityVariant = (p: number) => {
-		if (p === 1) return 'high';
-		if (p === 3) return 'low';
-		return 'normal';
-	};
+	let priorityLabel = $derived(
+		parsedTask ? PRIORITY_LABELS[parsedTask.priority as 1 | 2 | 3] || '' : ''
+	);
+
+	let recurrenceText = $derived(
+		parsedTask?.recurrenceRule
+			? recurrenceService.formatRecurrenceForDisplay(parsedTask.recurrenceRule, 'en')
+			: ''
+	);
 </script>
 
 {#if loading}
-	<div class="flex items-center gap-2 p-3 bg-gray-50 rounded-lg border border-gray-200">
+	<div class="flex items-center gap-2 py-3 px-4 bg-[#f5f5f7] rounded-xl mt-3">
 		<Spinner size="sm" />
-		<span class="text-sm text-gray-600">Analyzing task...</span>
+		<span class="text-[13px] text-[#8e8e93]">Analyzing...</span>
 	</div>
 {:else if error}
-	<div class="p-3 bg-red-50 rounded-lg border border-red-200">
-		<p class="text-sm text-red-600">{error}</p>
+	<div class="py-3 px-4 bg-[#fff5f5] rounded-xl mt-3">
+		<p class="text-[13px] text-[#ff3b30]">{error}</p>
 	</div>
 {:else if parsedTask}
-	<div class="p-3 bg-blue-50 rounded-lg border border-blue-200">
-		<div class="flex items-start justify-between gap-2">
-			<div class="flex-1">
-				<p class="font-medium text-gray-900">{parsedTask.title}</p>
-				<div class="flex flex-wrap items-center gap-2 mt-2">
-					<Badge variant={priorityVariant(parsedTask.priority)}>
-						{PRIORITY_LABELS[parsedTask.priority as 1 | 2 | 3]}
-					</Badge>
-					{#if parsedTask.dueDate}
-						<span class="text-xs text-gray-600">
-							{formatDate(parsedTask.dueDate)}
-						</span>
-					{/if}
-					{#if parsedTask.recurrenceRule}
-						<span class="text-xs text-gray-600">
-							{formatRecurrence(parsedTask.recurrenceRule)}
-						</span>
-					{/if}
-				</div>
-			</div>
+	<div class="py-3 px-4 bg-[#f5f5f7] rounded-xl mt-3">
+		<p class="text-[15px] text-[#1d1d1f] font-medium">{parsedTask.title}</p>
+		<div class="flex flex-wrap items-center gap-x-2 gap-y-1 mt-1">
+			{#if priorityLabel}
+				<span class="text-[13px] font-medium" style="color: {priorityColor}">
+					{priorityLabel}
+				</span>
+			{/if}
+			{#if parsedTask.dueDate}
+				<span class="text-[13px] text-[#8e8e93]">
+					{formatDate(parsedTask.dueDate)}
+				</span>
+			{/if}
+			{#if recurrenceText}
+				<span class="text-[13px] text-[#8e8e93]">
+					{recurrenceText}
+				</span>
+			{/if}
 		</div>
 	</div>
 {/if}

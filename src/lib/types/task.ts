@@ -9,12 +9,12 @@ export type TaskStatus = 'active' | 'completed';
 
 export const PRIORITY_LABELS: Record<TaskPriority, string> = {
 	1: 'High',
-	2: 'Normal',
+	2: 'Medium',
 	3: 'Low'
 };
 
 export const PRIORITY_COLORS: Record<TaskPriority, string> = {
-	1: 'bg-red-100 text-red-800',
-	2: 'bg-blue-100 text-blue-800',
-	3: 'bg-gray-100 text-gray-800'
+	1: '#ff3b30', // Red - High
+	2: '#ff9500', // Yellow/Orange - Medium
+	3: '#007aff'  // Blue - Low
 };

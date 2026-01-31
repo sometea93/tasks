@@ -3,33 +3,18 @@
 	import { createBrowserClient } from '@supabase/ssr';
 	import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public';
 	import type { Database } from '$lib/types/database.types';
-	import { tasksStore, activeTasks } from '$lib/stores/tasks';
-	import { completionsStore, completionSet } from '$lib/stores/completions';
+	import { tasksStore } from '$lib/stores/tasks';
+	import { completionsStore } from '$lib/stores/completions';
 	import { authStore } from '$lib/stores/auth';
 	import { TaskService } from '$lib/services/task-service';
 	import { CompletionService } from '$lib/services/completion-service';
 	import { RealtimeManager } from '$lib/services/realtime-manager';
-	import { createCompletionKey } from '$lib/services/recurrence-service';
-	import type { ParsedTask } from '$lib/types/nlp-response';
-	import TaskInput from '$lib/components/tasks/TaskInput.svelte';
-	import TaskList from '$lib/components/tasks/TaskList.svelte';
+	import CalendarView from '$lib/components/calendar/CalendarView.svelte';
 	import NavTabs from '$lib/components/ui/NavTabs.svelte';
 
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
-
-	// Filter out recurring tasks where today's instance is already completed
-	let visibleTasks = $derived.by(() => {
-		const today = new Date();
-		return $activeTasks.filter((task) => {
-			// Non-recurring tasks: always show if active
-			if (!task.recurrence_rule) return true;
-			// Recurring tasks: hide if today's instance is completed
-			const key = createCompletionKey(task.id, today);
-			return !$completionSet.has(key);
-		});
-	});
 
 	let taskService: TaskService | null = null;
 	let completionService: CompletionService | null = null;
@@ -54,30 +39,6 @@
 		realtimeManager?.unsubscribe();
 	});
 
-	async function handleCreateTask(parsedTask: ParsedTask, originalInput: string) {
-		if (!$authStore.user || !taskService) return;
-
-		const createdTask = await taskService.createTask(
-			{
-				title: parsedTask.title,
-				priority: parsedTask.priority,
-				due_date: parsedTask.dueDate,
-				recurrence_rule: parsedTask.recurrenceRule,
-				original_input: originalInput
-			},
-			$authStore.user.id
-		);
-
-		// Add to store immediately for instant feedback (store handles duplicates)
-		tasksStore.addTask(createdTask);
-	}
-
-	async function handleCompleteTask(id: string) {
-		if (!taskService) return;
-		await taskService.completeTask(id);
-		tasksStore.removeTask(id);
-	}
-
 	async function handleCompleteInstance(taskId: string, instanceDate: Date) {
 		if (!$authStore.user || !completionService || !taskService) return;
 
@@ -91,7 +52,7 @@
 			return;
 		}
 
-		// For recurring tasks, create a completion record for this instance
+		// For recurring tasks, create a completion record
 		try {
 			const completion = await completionService.completeInstance(
 				taskId,
@@ -104,12 +65,6 @@
 		}
 	}
 
-	async function handleDeleteTask(id: string) {
-		if (!taskService) return;
-		await taskService.deleteTask(id);
-		tasksStore.removeTask(id);
-	}
-
 	async function handleLogout() {
 		if (!supabase) return;
 		await supabase.auth.signOut();
@@ -118,31 +73,20 @@
 </script>
 
 <svelte:head>
-	<title>Tasks</title>
+	<title>Calendar - Tasks</title>
 </svelte:head>
 
 <div class="min-h-screen bg-white pb-20">
 	<div class="max-w-lg mx-auto px-4">
 		<header class="flex items-center justify-between py-4 border-b border-[#f5f5f7]">
-			<h1 class="text-[28px] font-bold text-[#1d1d1f]">Tasks</h1>
-			<button
-				onclick={handleLogout}
-				class="text-[15px] text-[#007aff] hover:text-[#0056b3]"
-			>
+			<h1 class="text-[28px] font-bold text-[#1d1d1f]">Calendar</h1>
+			<button onclick={handleLogout} class="text-[15px] text-[#007aff] hover:text-[#0056b3]">
 				Sign Out
 			</button>
 		</header>
 
 		<main class="py-2">
-			<TaskInput onSubmit={handleCreateTask} />
-
-			<TaskList
-				tasks={visibleTasks}
-				loading={$tasksStore.loading}
-				onComplete={handleCompleteTask}
-				onCompleteInstance={handleCompleteInstance}
-				onDelete={handleDeleteTask}
-			/>
+			<CalendarView tasks={$tasksStore.tasks} onCompleteInstance={handleCompleteInstance} />
 		</main>
 	</div>
 

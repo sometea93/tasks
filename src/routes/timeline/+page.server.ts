@@ -6,20 +6,19 @@ export const load: PageServerLoad = async ({ locals }) => {
 		redirect(303, '/auth');
 	}
 
-	// Fetch initial tasks
-	const { data: tasks, error } = await locals.supabase
+	// Fetch active tasks with due dates or recurrence rules
+	const { data: tasks, error: tasksError } = await locals.supabase
 		.from('tasks')
 		.select('*')
 		.eq('status', 'active')
-		.order('priority', { ascending: true, nullsFirst: true })
-		.order('due_date', { ascending: true, nullsFirst: false })
-		.order('created_at', { ascending: false });
+		.or('due_date.not.is.null,recurrence_rule.not.is.null')
+		.order('due_date', { ascending: true, nullsFirst: false });
 
-	if (error) {
-		console.error('Failed to fetch tasks:', error);
+	if (tasksError) {
+		console.error('Failed to fetch tasks:', tasksError);
 	}
 
-	// Fetch completions for date range (6 months back and forward)
+	// Fetch completions for an extended range (6 months back and forward)
 	const now = new Date();
 	const startDate = new Date(now);
 	startDate.setMonth(now.getMonth() - 6);

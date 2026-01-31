@@ -3,8 +3,6 @@
 	import { debounce } from '$lib/utils/debounce';
 	import type { ParsedTask } from '$lib/types/nlp-response';
 	import TaskPreview from './TaskPreview.svelte';
-	import Button from '$lib/components/ui/Button.svelte';
-	import Spinner from '$lib/components/ui/Spinner.svelte';
 
 	interface Props {
 		onSubmit: (task: ParsedTask, originalInput: string) => Promise<void>;
@@ -74,25 +72,28 @@
 	}
 </script>
 
-<div class="space-y-3">
+<div>
 	<form onsubmit={handleSubmit}>
-		<div class="flex gap-2">
+		<div class="flex items-center gap-3 py-3 border-b border-[#f5f5f7]">
+			<div class="w-[22px] h-[22px] rounded-full border-[1.5px] border-[#c7c7cc] flex-shrink-0"></div>
 			<input
 				type="text"
 				bind:value={input}
 				oninput={handleInput}
 				onkeydown={handleKeyDown}
-				placeholder="Add a task... (e.g., 'Meeting with Pedro tomorrow at 3pm, urgent')"
-				class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+				placeholder="Add a task"
+				class="flex-1 text-[15px] text-[#1d1d1f] placeholder-[#8e8e93] bg-transparent border-0 outline-none"
 				disabled={submitting}
 			/>
-			<Button type="submit" disabled={!parsedTask || submitting || parsing}>
-				{#if submitting}
-					<Spinner size="sm" />
-				{:else}
+			{#if parsedTask && !parsing}
+				<button
+					type="submit"
+					disabled={submitting}
+					class="text-[15px] font-medium text-[#007aff] hover:text-[#0056b3] disabled:opacity-50"
+				>
 					Add
-				{/if}
-			</Button>
+				</button>
+			{/if}
 		</div>
 	</form>
 
