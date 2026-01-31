@@ -1,0 +1,20 @@
+import type { Session, SupabaseClient, User } from '@supabase/supabase-js';
+import type { Database } from '$lib/types/database.types';
+
+declare global {
+	namespace App {
+		interface Locals {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			supabase: SupabaseClient<Database, any, any>;
+			safeGetSession: () => Promise<{ session: Session | null; user: User | null }>;
+			session: Session | null;
+			user: User | null;
+		}
+		interface PageData {
+			session: Session | null;
+			user: User | null;
+		}
+	}
+}
+
+export {};
